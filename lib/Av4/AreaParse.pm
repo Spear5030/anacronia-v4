@@ -10,6 +10,7 @@ use Av4::Area;
 use Av4::Help;
 use Av4::Entity::Mobile;
 use JSON::XS qw<>;
+use Encode;
 
 our $helps = [];
 our $areas = [];
@@ -35,6 +36,7 @@ sub area_file_parse {
     open my $F, '<', $fn;
     my $json = do { local $/ = undef; <$F>; };
     close $F;
+    my $json = encode('UTF-8', $json);
     my $data = JSON::XS->new->utf8->allow_blessed->convert_blessed->decode($json);
     if ( exists $data->{helps} ) {
         for my $dhelp ( @{ $data->{helps} } ) {
