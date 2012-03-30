@@ -11,6 +11,8 @@ use Time::HiRes qw/tv_interval gettimeofday time/;
 
 use Log::Log4perl;
 use YAML;
+use utf8;
+use Encode;
 
 use Av4::Help;
 use Av4::Area;
@@ -420,6 +422,7 @@ sub client_read {
             $server->clients(  [ grep { defined $_ && $_->id != $_[0] } @{ $server->clients } ] );
             $server->entities( [ grep { defined $_ && $_->id != $_[0] } @{ $server->entities } ] );
         }
+        $typed = decode($user->codepage(), $typed) if $user->codepage();
         push @{ $user->queue }, $typed;
     }
 

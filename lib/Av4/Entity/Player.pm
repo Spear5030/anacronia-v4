@@ -16,6 +16,7 @@ sub defaults {
         is_player => 1,
         state     => 0,
         in_room   => 30,
+        codepage  => '', #koi8r, cp1251, etc
     );
 }
 
@@ -30,6 +31,7 @@ use Class::XSAccessor {
           mcp_packages_supported
           host
           port
+          codepage
           /
     ],
 };

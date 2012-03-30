@@ -1,6 +1,8 @@
 package Av4::TelnetOptions;
 use strict;
 use warnings;
+use utf8;
+use Encode;
 use Compress::Raw::Zlib;
 use Av4::Utils qw/get_logger/;
 use Av4::Telnet qw/
@@ -54,8 +56,17 @@ sub new {
 sub send_data {
     my $self = shift;
     my $out  = shift;
-    $out =~ s/\xFF/\xFF\xFF/g if $out =~ /\xFF/;    # IAC IAC => IAC
+    my $iacga= undef;
+    #$out =~ s/\xFF/\xFF\xFF/g if $out =~ /\xFF/;    # IAC IAC => IAC  ?
+    if ($$out=~ /\xFF\xF9\r\n/){
+        $iacga = 1;
+        $$out=~ s/\xFF\xF9\r\n/\r\n/;
+    }
+    $$out =~ s/\xFF\xFF/\xFF/g if $$out =~ /\xFF/; 
+    $$out =~ s/я/яя/g if $self->user->codepage() eq 'cp1251'; 
     my $lenout = length $$out;
+    $$out = encode($self->user->codepage(), $$out) if $self->user->codepage();
+    $$out = $$out . sprintf("%c%c",TELOPT_IAC, TELOPT_GA,) if ($iacga);
     if ( !$self->mccp ) {
 
         #$log->trace( "Sending data to client ", $self->user, " via plain text" );
